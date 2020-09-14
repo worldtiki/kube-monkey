@@ -1,7 +1,7 @@
 all: test
 
 ENVVAR = GOOS=linux GOARCH=amd64 CGO_ENABLED=0
-TAG = v0.2.3
+TAG := $(shell cat VERSION)
 GOLANGCI_INSTALLED := $(shell which bin/golangci-lint)
 
 
@@ -28,7 +28,7 @@ ifdef https_proxy
 docker_args+= --build-arg https_proxy=$(https_proxy)
 endif
 
-# Supressing docker build avoids printing the env variables
+# Suppressing docker build avoids printing the env variables
 container:
 	@echo "Running docker with '$(docker_args)'"
 	@docker build $(docker_args) -t kube-monkey:$(TAG) .
@@ -36,8 +36,12 @@ container:
 gofmt:
 	find . -path ./vendor -prune -o -name '*.go' -print | xargs -L 1 -I % gofmt -s -w %
 
+# Same as gofmt, but also orders imports
+goimports:
+	find . -path ./vendor -prune -o -name '*.go' -print | xargs -L 1 -I % goimports -w %
+
 clean:
 	rm -f kube-monkey
 
 test: build
-	go test -v -cover ./...
+	go test -v -cover -gcflags=-l ./...
