@@ -18,7 +18,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
       - name: Build
-        run: make unit-tests
+        run: make test
       
       - name: Build and push Docker images on new git tags
         uses: docker/build-push-action@v1
